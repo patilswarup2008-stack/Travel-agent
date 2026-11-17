@@ -12,12 +12,12 @@ client = genai.Client()
 
 def set_background(path):
     with open(path, "rb") as f:
-        data = base64.b64encode(f.read()).decode()
-    st.markdown(
-        f"""
-        <style>
+        data = base64.b64encode(f.read()).decode()                              #for setting background 
+    st.markdown(                                  
+        f"""                                              
+        <style> 
         .stApp {{
-            background-image: url("data:image/jpg;base64,{data}");
+            background-image: url("data:image/jpg;base64,{data}");              
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -35,7 +35,46 @@ st.markdown(
 st.title(":violet[🌏TRAVEL ASSISTANT]",text_alignment="center")
 set_background("other\image.jpg")
 st.header("Hello this is your Travel Assistant Lets plan your trip together",text_alignment="center")
-st.text("👉Do you want Me to select your Travel Location ",text_alignment="center")
+st.subheader("👉Do you want Me to select your Travel Location ")
+
+def plan_trip():
+    c_loc = st.text_input("Enter starting location")
+    Des_loc = st.text_input("Enter selected location")
+    passangers = st.number_input("Enter No. passangers",0,50)
+    Days=st.number_input("Decided Days",0,30)
+    Standard = st.selectbox(
+        "Select Budget?",
+        ("Luxary", "Mid-Range", "Budget"),
+    )
+    mode=st.selectbox(
+        "Perfer Mode of transport?",
+        ("Flight","Self Car","Railway","Bus"),
+    )
+    st.write("You selected:", mode)
+
+    
+    if st.button("Done"):
+        interaction = client.interactions.create(
+            model="gemini-3.5-flash-lite",
+            input=f"""I want to go to trip which would be of type{Standard}
+to {Des_loc} and I am starting for {c_loc} I want a full trip plan of {Days} Days I would perfer my Transport as {mode} 
+considering total number of passangers as {passangers} """,
+            stream=True,
+            system_instruction="""Your a smart Travel assistant bot You have to plan 2 or 3 daywise trip plan starting from beginning of journey 
+spots to visit on day1 afternoon launch to evening event then dinner and night stay such for all number of days that are given as per input mode of transport 
+provide respective ticket links or booking link also try to put genral price of ticket/booking  """
+        )
+    
+        with st.spinner("Wait for it...", show_time=True):
+            time.sleep(5)
+        st.success("Let's select")
+        st.button("Change input")
+
+        for event in interaction:                                   #for stream of Text
+            if event.event_type =="step.delta":
+                if event.delta.type=="text":
+                    st.write(event.delta.text)
+    
 
 def Random_loc():
     st.text("📍 selecting location with some info")
@@ -71,23 +110,12 @@ and quick dont add intro of your self in output """,
             if event.event_type =="step.delta":
                 if event.delta.type=="text":
                     st.write(event.delta.text)
-        plan_trip()
-
-def plan_trip():
-    st.text_input("Enter selected location")
-    st.number_input("Enter No. passangers",0,50)
-    Standard = st.selectbox(
-        "Select Budget?",
-        ("Luxary", "Mid-Range", "Budget"),
-    )
-    st.write("You selected:", Standard)
-    
 
 
 
 
 choice = st.radio(
-    "Do you want me to select your travel location?",
+    " ",
     ["YES", "NO"],
     horizontal=True,
     index=None,
@@ -95,54 +123,18 @@ choice = st.radio(
 
 if choice == "YES":
     Random_loc()
-    choice = st.radio("⏱️Ready to plan trip",
+
+    st.header("⏱️Ready to plan trip")
+    start= st.radio("",
     ["Ready", "Wait"],
     horizontal=True,
     index=None,
     )
-    if choice == "Ready":
+    if start == "Ready":
         plan_trip()
-
+    elif start == "Wait":
+        st.text("Change inputs to decide Destination")
 
 elif choice == "NO":
     plan_trip()
     
-
-
-
-
-
-
-
-
-
-
-# query=input("GEMINI:")
-# id=None                                              #dummy variable to store history
-# while True:
-#     interaction = client.interactions.create(
-#         model ="gemini-3.5-flash-lite",
-#         input= query,
-#         stream=True, # for stream of text genrated
-#         system_instruction="""Your a smart Travel assistant bot that gives replies in simple 
-#                                and effectives way using bullet marks with proper arrangement, 
-#                                paragraph writing and try help too resolue problem of user fast 
-#                                and quick dont add intro of your self in output
-#                             """, #behaviour of bot
-#         generation_config={
-#             "temperature":0.7,
-#             "max_output_tokens":500
-#         },
-#         previous_interaction_id=id                              # chat history
-#     )
-
-#     print("\n GEMINI Replies \n\n")
-#     for event in interaction:                                   #for stream of Text
-#         if event.event_type =="step.delta":
-#             if event.delta.type=="text":
-#                 print(event.delta.text,end="",flush=True)
-
-#     id = event.interaction.id
-#     query=input("\n GEMINI:")
-#     if (query==None) or (query=="exit"):
-#         break
