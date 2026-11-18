@@ -59,21 +59,18 @@ def plan_trip():
             input=f"""I want to go to trip which would be of type{Standard}
 to {Des_loc} and I am starting for {c_loc} I want a full trip plan of {Days} Days I would perfer my Transport as {mode} 
 considering total number of passangers as {passangers} """,
-            stream=True,
             system_instruction="""Your a smart Travel assistant bot You have to plan 2 or 3 daywise trip plan starting from beginning of journey 
 spots to visit on day1 afternoon launch to evening event then dinner and night stay such for all number of days that are given as per input mode of transport 
 provide respective ticket links or booking link also try to put genral price of ticket/booking  """
         )
     
         with st.spinner("Wait for it...", show_time=True):
-            time.sleep(5)
-        st.success("Let's select")
+            time.sleep(7)
+        st.success("Travel plan!")
         st.button("Change input")
 
-        for event in interaction:                                   #for stream of Text
-            if event.event_type =="step.delta":
-                if event.delta.type=="text":
-                    st.write(event.delta.text)
+        st.write(interaction.output_text)
+        print(interaction.output_text)
     
 
 def Random_loc():
@@ -90,7 +87,6 @@ def Random_loc():
 my current city is {c_loc}
 find some best in range of {dis} Km
 suggest all famous and important spot in that range""",
-            stream=True,
             system_instruction="""Your a smart Travel assistant bot that gives replies in simple
 and effective way using bullet marks with proper block arrangement,
 paragraph writing put text in bracket in same line only, give roman number to place and try help too resolve problem of user fast
@@ -106,10 +102,7 @@ and quick dont add intro of your self in output """,
         st.success("Let's select")
         st.button("Change input")
 
-        for event in interaction:                                   #for stream of Text
-            if event.event_type =="step.delta":
-                if event.delta.type=="text":
-                    st.write(event.delta.text)
+        st.text(interaction.output_text)
 
 
 
